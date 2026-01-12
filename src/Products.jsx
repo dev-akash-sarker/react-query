@@ -1,37 +1,28 @@
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 
+const fetchProducts = async () => {
+  const response = await fetch("https://dummyjson.com/products");
+  const data = await response.json();
+  return data.products;
+};
 const Products = () => {
-  const [products, setProducts] = useState([]);
-  const [islLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const {
+    isLoading,
+    error,
+    data: products,
+  } = useQuery({ queryKey: ["products"], queryFn: fetchProducts});
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const response = await fetch("https://dummyjson.com/products");
-        const data = await response.json();
+  // const [products, setProducts] = useState([]);
+  // const [islLoading, setIsLoading] = useState(false);
+  // const [error, setError] = useState(null);
 
-        setProducts(data.products);
-        console.log(data.products);
-        setIsLoading(false);
-      } catch (error) {
-        setError(error.message);
-        setIsLoading(false);
-      }
-    };
-
-    fetchProducts();
-  }, []);
-
-  if (islLoading) {
+  if (isLoading) {
     return <div>Loading...</div>;
   }
 
-  if(error) {
-    return <h3>Error: {error}</h3>
+  if (error) {
+    return <h3>Error: {error.message}</h3>;
   }
 
   return (
